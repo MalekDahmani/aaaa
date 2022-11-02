@@ -1,21 +1,28 @@
 const mongoose = require ('mongoose')
 const express = require ('express')
-var cors = require('cors')
+
 const bodyParser = require ('body-parser')
 const logged = require ('morgan')
 const connectDB = require('./config/connectDB')
-const authRouter = require ('./routes/auth')
+require ('dotenv').config({path:'./config/.env'})
+
+const workoutRoutes = require ('./routes/workout')
+const userRoutes = require ('./routes/user')
+const auth = require ('./middleware/auth')
 
 
-
-
-const PORT = 3001
 
 const app = express()
 
-// app.use(cors())
+const PORT = 3001 
 
-const router = express.Router()
+
+
+
+app.use((req,res,next)=>{
+    console.log(req.path , req.method)
+    next()
+ })
 
 connectDB();
 
@@ -24,11 +31,9 @@ app.use(bodyParser.json())
 app.use(logged('dev'))
 
 
-router.get('/', getPost)
 
-router.post('/', createPost)
-
-app.use('/api',router)
+app.use('/api/workout',auth,workoutRoutes)
+app.use("/api/user",auth,userRoutes)
 
 
 
