@@ -1,43 +1,35 @@
 const mongoose = require ('mongoose')
 const express = require ('express')
 
-const bodyParser = require ('body-parser')
-const logged = require ('morgan')
-const connectDB = require('./config/connectDB')
-require ('dotenv').config({path:'./config/.env'})
+
+require ('dotenv').config({path:'./.env'})
 
 const workoutRoutes = require ('./routes/workout')
 const userRoutes = require ('./routes/user')
-const auth = require ('./middleware/auth')
+
 
 
 
 const app = express()
-
 const PORT = 3001 
 
-
-
+app.use(express.json())
 
 app.use((req,res,next)=>{
     console.log(req.path , req.method)
     next()
  })
 
-connectDB();
 
-app.use(bodyParser.urlencoded({extended:false}))
-app.use(bodyParser.json())
-app.use(logged('dev'))
+app.use('/api/workout',workoutRoutes)
+app.use("/api/user",userRoutes)
 
-
-
-app.use('/api/workout',auth,workoutRoutes)
-app.use("/api/user",auth,userRoutes)
-
-
-
-
-app.listen(PORT,()=>{
-    console.log(`LISTENING ON PORT ${PORT}`)
+app.listen(PORT,async()=>{
+    try{
+        await mongoose.connect('mongodb+srv://MalekMern:malek123@cluster0.ijeetiu.mongodb.net/?retryWrites=true&w=majority')
+        console.log(`server is listening on port ${PORT}`)
+        console.log("Connection successfull")
+      }catch(err){
+         console.log(err)
+      }
 })
